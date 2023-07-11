@@ -18,7 +18,7 @@ import plotly.graph_objects as go
 
 # Read the CSV data
 
-data = pd.read_csv('https://raw.githubusercontent.com/tuannas20334445566/bio/main/data.csv')
+data = pd.read_csv('https://raw.githubusercontent.com/ngocanhjs/1031/main/data.csv')
 
  
 
@@ -118,174 +118,159 @@ app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
 server = app.server
 
- 
-
-# Define the sidebar
-
-sidebar = dbc.Nav(
-
-    [
-
-        html.H2('Main Menu'),
-
-        html.Hr(),
-
-        html.P('Select a section below:'),
-
-        dbc.NavLink('Bar Chart', href='#bar-chart'),
-
-        dbc.NavLink('Pie Chart', href='#pie-chart'),
-
-        dbc.NavLink('Box Chart', href='#box-chart'),
-
-        dbc.NavLink('Scatter Plot', href='#scatter-plot'),
-
-    ],
-
-    vertical=True,
-
-    pills=True,
-
-)
-
- 
-
 app.layout = dbc.Container([
 
-    # Add the sidebar
+    dbc.Row([
 
-    sidebar,
-
-    html.Div(
-
-        [
+        dbc.Col([
 
             html.H1('NETFLIX TV SHOW DATA VISUALIZATION', style={'text-align': 'center'}),
-
+            
             html.Hr(),
+            
+            # Sidebar
+            
+            dbc.Nav(
+                [
+                    dbc.NavLink("Bar Chart", href="#", id="bar-chart-link"),
+                    dbc.NavLink("Box Chart", href="#", id="box-chart-link"),
+                    dbc.NavLink("Pie Chart", href="#", id="pie-chart-link"),
+                    dbc.NavLink("Scatter Plot", href="#", id="scatter-plot-link"),
+                ],
+                vertical=True,
+                pills=True,
+            ),
+        ], md=2),
 
-            dbc.Row([
+        dbc.Col([
+            html.Div(id="content"),
+        ], md=10)
+    ]),
+    
+    html.Hr(),
 
-                dbc.Col([
-
-                    html.Hr(),
-
-                    html.H2('The Distribution of Main Genre', style={'text-align': 'center', 'color': 'black'}),
-
-                    html.H5('THE BAR CHART', id='bar-chart'),
-
-                    html.P('Number of countries:'),
-
-                    dcc.Slider(id='slider', min=1, max=5, step=1, value=5),
-
-                    dcc.Graph(id='plot-bar', figure=fig_bar)
-
-                ], md=6),
-
-                dbc.Col([
-
-                    html.H5('THE PIE CHART', id='pie-chart'),
-
-                    dcc.Graph(id='plot-pie', figure=fig_pie)
-
-                ], md=6)
-
-            ]),
-
+    dbc.Row([
+        dbc.Col([
             html.Hr(),
+            html.H2('The Distribution of Main Genre', style={'text-align': 'center', 'color': 'black'}),
+            html.H5('THE BAR CHART'),
+            html.P('Number of countries:'),
+            dcc.Slider(id='slider', min=1, max=5, step=1, value=5),
+            dcc.Graph(id='plot-bar', figure=fig_bar)
+        ], md=6),
 
-            dbc.Row([
+        dbc.Col([
+            html.H5('THE PIE CHART'),
+            dcc.Graph(id='plot-pie', figure=fig_pie)
+        ], md=6)
+    ]),
 
-                html.H2('The Distribution of Main Genre', style={'text-align': 'center', 'color': 'black'}),
+    html.Hr(),
 
-                dbc.Col([
+    dbc.Row([
+        html.H2('The Distribution of Main Genre', style={'text-align': 'center', 'color': 'black'}),
+        dbc.Col([
+            html.Hr(),
+            html.H5('THE MAIN BOX CHART', style={'text-align': 'center'}),
+            dcc.Graph(id='plot-box', figure=fig_box, style={'height': 950}),
+        ], width=6),
 
-                    html.Hr(),
-
-                    html.H5('THE MAIN BOX CHART', style={'text-align': 'center'}),
-
-                    dcc.Graph(id='plot-box', figure=fig_box, style={'height': 950}),
-
-                ], width=6),
-
-                dbc.Col([
-
-                    html.Hr(),
-
-                    html.H5('THE SCATTER PLOT', className='text-center', id='scatter-plot'),
-
-                    html.Hr(),
-
-                    html.H6('Select genre that you want to see:', className='text-center'),
-
-                    dcc.Dropdown(
-
-                        id='dropdown',
-
-                        options=[{"label": option, "value": option} for option in data["MAIN_GENRE"].unique()],
-
-                        value="drama"
-
-                    ),
-
-                    dcc.Graph(id="plot-sub-box"),
-
-                ], width=5)
-
-            ],style={'margin': '30px'}),
-
-        ],
-
-    )
-
+        dbc.Col([
+            html.Hr(),
+            html.H5('THE SCATTER PLOT', className='text-center'),
+            html.Hr(),
+            html.H6('Select genre that you want to see:', className='text-center'),
+            dcc.Dropdown(
+                id='dropdown',
+                options=[{"label": option, "value": option} for option in data["MAIN_GENRE"].unique()],
+                value="drama"
+            ),
+            
+            dcc.Graph(id="plot-sub-box"),
+        ], width=5)
+    ],style={'margin': '30px'}),
+    
 ], fluid=True)
 
- 
+# Callback to update content based on sidebar click
+
+@app.callback(
+    Output("content", "children"),
+    [Input("bar-chart-link", "n_clicks"),
+     Input("box-chart-link", "n_clicks"),
+     Input("pie-chart-link", "n_clicks"),
+     Input("scatter-plot-link", "n_clicks")],
+)
+def update_content(bar_chart_clicks, box_chart_clicks, pie_chart_clicks, scatter_plot_clicks):
+    
+    if bar_chart_clicks:
+        return html.Div([
+            html.H2('The Distribution of Main Genre', style={'text-align': 'center', 'color': 'black'}),
+            html.H5('THE BAR CHART'),
+            html.P('Number of countries:'),
+            dcc.Slider(id='slider', min=1, max=5, step=1, value=5),
+            dcc.Graph(id='plot-bar', figure=fig_bar)
+        ])
+    
+    elif box_chart_clicks:
+        return html.Div([
+            html.H2('The Distribution of Main Genre', style={'text-align': 'center', 'color': 'black'}),
+            html.H5('THE MAIN BOX CHART', style={'text-align': 'center'}),
+            dcc.Graph(id='plot-box', figure=fig_box, style={'height': 950}),
+        ])
+    
+    elif pie_chart_clicks:
+        return html.Div([
+            html.H2('The Distribution of Main Genre', style={'text-align': 'center', 'color': 'black'}),
+            html.H5('THE PIE CHART'),
+            dcc.Graph(id='plot-pie', figure=fig_pie)
+        ])
+    
+    elif scatter_plot_clicks:
+        return html.Div([
+            html.H2('The Distribution of Main Genre', style={'text-align': 'center', 'color': 'black'}),
+            html.H5('THE SCATTER PLOT', className='text-center'),
+            html.H6('Select genre that you want to see:', className='text-center'),
+            dcc.Dropdown(
+                id='dropdown',
+                options=[{"label": option, "value": option} for option in data["MAIN_GENRE"].unique()],
+                value="drama"
+            ),
+            dcc.Graph(id="plot-sub-box"),
+        ])
+    
+    else:
+        return html.Div([
+            html.H2('The Distribution of Main Genre', style={'text-align': 'center', 'color': 'black'}),
+            html.H5('THE BAR CHART'),
+            html.P('Number of countries:'),
+            dcc.Slider(id='slider', min=1, max=5, step=1, value=5),
+            dcc.Graph(id='plot-bar', figure=fig_bar)
+        ])
 
 # Callback to update the bar chart based on the slider value
 
 @app.callback(Output('plot-bar', 'figure'), [Input('slider', 'value')])
-
 def update_bar_chart(value):
-
     df1 = df_bar.nlargest(n=value, keep='all').sort_values(ascending=False)
-
     fig_bar.update_layout(title='Top {} countries that have the most TV shows in the period 1970 - 2020'.format(value))
-
     fig_bar.update_traces(y=df1.values, x=df1.index)
-
     return fig_bar
-
- 
 
 # Callback to update the scatter plot based on the dropdown selection
 
 @app.callback(Output('plot-sub-box', 'figure'), [Input('dropdown', 'value')])
-
 def update_scatter_plot(genre_selection):
-
     data_subset = data.loc[data['MAIN_GENRE'] == genre_selection]
-
     fig = px.scatter(
-
         data_subset,
-
         x="RELEASE_YEAR",
-
         y="SCORE",
-
         color="MAIN_GENRE",
-
         title=f"The scatter plot for {genre_selection} genre",
-
         color_discrete_map={genre: color for genre, color in zip(data['MAIN_GENRE'].unique(), ['goldenrod', 'hotpink', 'chocolate', 'lawngreen', 'dodgerblue'])}
-
     )
-
     return fig
 
- 
-
 if __name__ == '_main_':
-
     app.run_server(debug=True)
