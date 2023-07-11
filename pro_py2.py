@@ -18,7 +18,7 @@ import plotly.graph_objects as go
 
 # Read the CSV data
 
-data = pd.read_csv('https://raw.githubusercontent.com/ngocanhjs/1031/main/data.csv')
+data = pd.read_csv('https://raw.githubusercontent.com/tuannas20334445566/bio/main/data.csv')
 
  
 
